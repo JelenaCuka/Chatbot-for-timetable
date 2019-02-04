@@ -20,9 +20,9 @@ $(document).ready(function(e) {
         $("#errorLogin").text("");
         var noviUser = $("#usernameLogin").val();
         if (noviUser != ""){
-            session = pl.create();
+            //session = pl.create();
             if(session){
-                session.consult( "baza.pl" );
+                //session.consult( "baza.pl" );
                 //var query = 'korime(ivo).';
                 var query = "login("+noviUser+").";
                 console.log(query);
