@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Chatbot</title>
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet">
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="css/resume.min.css" rel="stylesheet">
+    <link href="css/chat.css" rel="stylesheet">
+    <script src="js/tau-prolog.js"></script> 
+    <script src="js/chatbot.js"></script>
+
+    <script id="baza.pl" type="text/prolog">
+%ovo nema smisla ovdje drzati ali previse problema s ucitavanjem pl datoteka ne znam zasto katastrofa
+:-use_module(library(lists)).
+:- use_module(library(dom)).
+:- use_module(library(js)).
+
+:- dynamic(korime/1).
+:- dynamic(korisnik/3).
+:- dynamic(dvorana/1).
+:- dynamic(zgrada/1).
+
+dan('pon').
+dan('uto').
+dan('sri').
+dan('cet').
+dan('pet').
+
+zgrada('foi1').
+zgrada('foi2').
+
+dvorana('1').
+dvorana('2').
+dvorana('3').
+dvorana('4').
+dvorana('5').
+dvorana('6').
+dvorana('7').
+dvorana('8').
+dvorana('9').
+dvorana('10').
+dvorana('11').
+dvorana('12').
+dvorana('13').
+dvorana('14').
+dvorana('15').
+
+postojiZgrada(X):- zgrada(X).
+postojiDvorana(X):- dvorana(X).
+postojiDan(X):- dan(X).
+jeBroj(X):- number(X), X >= 0 , X =< 24.
+
+%testni korisnici
+korime(ivo).
+korime(ana).
+%unos rasporeda za testne korisnike
+korisnik(ivo, [termin(8,10,1,foi2,lp), termin(12,14,2,foi2,air),termin(14,16,1,foi2,os2), termin(19,20,2,foi1,air)],pon).
+korisnik(ivo,[termin(9,10,1,foi1,lp)],uto).
+korisnik(ivo,[termin(10,11,1,foi2,programiranje), termin(11,15,2,foi2,informatika)],sri).
+korisnik(ivo,[],cet).
+korisnik(ivo,[termin(8,10,1,foi1,lp), termin(12,14,2,foi2,air)],pet).
+
+korisnik(ana, [termin(8,10,1,foi2,tjelesni), termin(12,14,2,foi2,matematika),termin(14,16,1,foi2,fizika), termin(19,20,2,foi1,'neki predmet')],pon).
+korisnik(ana,[termin(9,10,1,foi1,lp),termin(10,11,1,foi2,'operacijski sustavi dva labosi')],uto).
+korisnik(ana,[termin(10,11,1,foi2,'operacijski sustavi dva'), termin(11,15,2,foi2,informatika)],sri).
+korisnik(ana,[termin(8,10,1,foi1,'opet tjelesni'), termin(12,14,2,foi2,air),termin(14,16,1,foi2,'teorija baza podataka')],cet).
+korisnik(ana,[],pet).
+
+%odgovoriNaPitanje(X):-
+    %apply(botOdgovara, X, Odgovor).
+
+%apply(botOdgovara,[neki,odgovor,je,ovo], Odgovor).
+
+not(P) :- call(P), !, fail.
+not(P). 
+
+registrirajKorisnika(NovoKorime) :-
+    not(korime(NovoKorime)),
+    assertz(korime(NovoKorime)),
+    assertz(korisnik(NovoKorime,[],pon)),
+    assertz(korisnik(NovoKorime,[],uto)),
+    assertz(korisnik(NovoKorime,[],sri)),
+    assertz(korisnik(NovoKorime,[],cet)),
+    assertz(korisnik(NovoKorime,[],pet)).
+
+%ovo nesto radi
+%korisnik(ana,[G|T],pon),arg(1,G,Od),arg(2,G,Do),arg(3,G,Dvorana),arg(4,G,Zgrada),arg(5,G,Predmet).
+%dovatiRasporedDan(Korisnik,Dan):-korisnik(Korisnik,[G|T],Dan),arg(1,G,Od),arg(2,G,Do),arg(3,G,Dvorana),arg(4,G,Zgrada),arg(5,G,Predmet).
+%ispis(Dan,G):-arg(1,G,Od),arg(2,G,Do),arg(3,G,Dvorana),arg(4,G,Zgrada),arg(5,G,Predmet),ISPIS=[Dan,' imas ',Predmet,' od ',Od,' do ',Do,' u dvorani ',Dvorana,', zgrada ',Zgrada ].
+%korisnik(ana,[G|T],pon),arg(1,G,Od),arg(2,G,Do),arg(3,G,Dvorana),arg(4,G,Zgrada),arg(5,G,Predmet),ISPIS=[pon,' imas ',Predmet,' od ',Od,' do ',Do,' u dvorani ',Dvorana,', zgrada ',Zgrada ].
+
+%nananananananan
+
+login(Korime) :-korime(Korime).
+
+%korisnik(ana,[G|T],pon),ispis(pon,G,ISPIS).
+
+ispisiSveDan([],_,IspisCiliDan).
+ispisiSveDan([Termin|Ostatak],PocetniIspis,IspisCiliDan):-ispis(pon,Termin,IspisJedanTerminUDanu),append(IspisJedanTerminUDanu,PocetniIspis,IspisCiliDan),ispisiSveDan([Ostatak],IspisCiliDan,IspisCiliDan).
+
+%ovo radi s pozivom korisnik,ispis ispis termina je ovo
+ispis(Dan,G,ISPIS):-arg(1,G,Od),arg(2,G,Do),arg(3,G,Dvorana),arg(4,G,Zgrada),arg(5,G,Predmet),ISPIS=[Dan,' imas ',Predmet,' od ',Od,' do ',Do,' u dvorani ',Dvorana,', zgrada ',Zgrada ].
+nalaziSeUObje(Rijec,Pitanje,DobraPitanja):-member(Rijec,Pitanje),member(Rijec,DobraPitanja).    
+ispisiSve(Dan,Svi,I):-member(X,Svi),ispis(Dan,X,I).
+danRaspored(Korime,Dan,Izlaz):-korisnik(Korime,P,Dan),member(X,P),ispis(Dan,X,Izlaz).
+
+danRasporedPredmet(Korime,Dan,Izlaz,Predmet):-korisnik(Korime,P,Dan),member(X,P),arg(5,X,Predmet),ispis(Dan,X,Izlaz).
+
+preklapanje(Od,Do,termin(NOd,NDo,_,_,_)) :- (Od =< NOd) , (Do >= NDo).
+%@=<(Od,NOd) ,@=>(Do,NDo)
+
+nemaPreklapanja([],_,_).
+nemaPreklapanja([G|R], Od,Do):-
+	nemaPreklapanja(R,Od,Do),
+    not(preklapanje(Od,Do,G)).
+
+dodajTermin(Od,Do,Dvorana,Zgrada,Predmet,Dan,Korime) :- 
+    korisnik(Korime,Raspored,Dan),
+    nemaPreklapanja(Raspored,Od,Do),
+    append([termin(Od,Do,Dvorana,Zgrada,Predmet)],Raspored,NoviRaspored),
+    retract(korisnik(Korime,Raspored,Dan)),
+    assertz(korisnik(Korime,NoviRaspored,Dan)).  
+
+</script>
+  </head>
+
+  <body id="page-top">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">
+        <span class="d-block d-lg-none">Chatbot raspored sati</span>
+        <span class="d-none d-lg-block">
+            <img class="img-fluid img-profile rounded-circle mx-auto mb-2" src="img/yoda.jpg" alt="">
+        </span>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#chat">Chat</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#login">Logiraj se</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#register">Registriraj se</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container-fluid p-0">
+
+      <section class="resume-section p-3 p-lg-5 d-flex d-column" id="chat">
+          <div class="my-auto chat" >
+          <h1 class="mb-0">Chat
+            <span class="text-primary">Bot</span>
+          </h1>
+          <div class="subheading mb-5">Pitaj me o svom rasporedu, ja znam sve :)</div>
+            <div class="container">
+            <div class="chatBox" id="chatBox">
+                <div class="response">
+                    <div id="AutoMessage"> <strong>bot:</strong> <br>Pitaj me o svom rasporedu :) </div>
+                </div>
+            </div>
+                <input class="w3-input" id="mesbox" type="text" placeholder="input here...">
+                <div class="my-auto">
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+              <form>
+                  <div class="container">
+                      <hr>
+                    <p>Popuniti za dodavanje novog termina</p>            
+                    <table class="table">
+                      <tbody>
+                          <tr>
+                          <th>Zgrada</th>
+                          <td><input type="text" class="form-control" id="zgrada" aria-describedby="emailHelp" ></td>
+                          <th>Dvorana</th>
+                          <td><input type="text" class="form-control" id="dvorana" aria-describedby="emailHelp" ></td>
+                        </tr>
+                        <tr>
+                          <th>Od</th>
+                          <td><input type="text" class="form-control" id="od" aria-describedby="emailHelp" ></td>
+                          <th>Do</th>
+                          <td><input type="text" class="form-control" id="do" aria-describedby="emailHelp" ></td>
+                        </tr>
+                        <tr>
+                          <th>Predmet</th>
+                          <td><input type="text" class="form-control" id="predmet" aria-describedby="emailHelp" ></td>
+                          <th>Dan</th>
+                          <td><input type="text" class="form-control" id="dann" aria-describedby="emailHelp" ></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="form-group">
+                      <small id="greskaDodavanje" class="form-text text-muted"></small>
+                  </div>
+              </form>
+        </div>
+            </div>
+
+        </div>
+      </section>
+      <script src="js/week.js" type="text/prolog"></script>  
+
+      <hr class="m-0">
+
+      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="login">
+        <div class="my-auto">
+          <h2 class="mb-5">LOGIN</h2>
+
+                    <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <div class="resume-content mr-auto">
+              <div class="subheading mb-3">Unesite podatke za prijavu</div>
+              <form>
+                  <div class="form-group">
+                      <label for="usernameLogin">Korisničko ime</label>
+                      <input type="text" class="form-control" id="usernameLogin" aria-describedby="emailHelp" placeholder="Unesite korisničko ime">
+                      <small id="errorLogin" class="form-text text-muted"></small>
+                  </div>
+                  <button id="buttonPrijava" style="background-color: #bd5d38!important; border-color: #ffffff" type="button" class="btn btn-primary">Prijava</button>
+              </form>
+            </div>
+                    </div>
+        </div>
+      </section>
+      
+
+      <hr class="m-0">
+
+      <section class="resume-section p-3 p-lg-5 d-flex flex-column" id="register">
+        <div class="my-auto">
+          <h2 class="mb-5">Register</h2>
+
+          <div class="resume-item d-flex flex-column flex-md-row mb-5">
+            <div class="resume-content mr-auto">
+              <div class="subheading mb-3">Unesite podatke za registraciju</div>
+              <form>
+                  <div class="form-group">
+                      <label for="registerUsername">Korisničko ime</label>
+                      <input type="text" class="form-control" id="registerUsername" aria-describedby="emailHelp" placeholder="Unesite korisničko ime">
+                  </div>
+                  
+                  <div class="form-group">
+                      <small id="greskaRegistracija" class="form-text text-muted"></small>
+                  </div>
+                  <button id="buttonRegistracija" style="background-color: #bd5d38!important; border-color: #ffffff" type="button" class="btn btn-primary">Registriraj se</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+      <hr class="m-0">
+      <hr class="m-0">
+    </div>
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/resume.min.js"></script>
+  </body>
+</html>
