@@ -9,6 +9,7 @@ Example login, example complete schedule query - response
 
 
 Example query - response ,query contains keywords >> today, tomorrow, monday-friday
+
 Example query Search by Subject name - response ,query contains keyword >> subject name
 ![2](https://user-images.githubusercontent.com/26230313/74100992-44edb380-4b35-11ea-95aa-3212c4e2db38.PNG)
 
